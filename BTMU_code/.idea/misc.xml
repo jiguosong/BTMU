@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="IpnbSettings">
+    <option name="username" value="jsong" />
+    <option name="workingDirectory" value="$USER_HOME$/notebooks/BTMU" />
+    <option name="URL" value="http://backtest1.sec1.veliosystems.com:6789" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.4.3 (/usr/bin/python3.4)" project-jdk-type="Python SDK" />
+</project>

@@ -1,0 +1,252 @@
+# the rule for pandas resample :
+# B       business day frequency
+# C       custom business day frequency (experimental)
+# D       calendar day frequency
+# W       weekly frequency
+# M       month end frequency
+# SM      semi-month end frequency (15th and end of month)
+# BM      business month end frequency
+# CBM     custom business month end frequency
+# MS      month start frequency
+# SMS     semi-month start frequency (1st and 15th)
+# BMS     business month start frequency
+# CBMS    custom business month start frequency
+# Q       quarter end frequency
+# BQ      business quarter endfrequency
+# QS      quarter start frequency
+# BQS     business quarter start frequency
+# A       year end frequency
+# BA      business year end frequency
+# AS      year start frequency
+# BAS     business year start frequency
+# BH      business hour frequency
+# H       hourly frequency
+# T       minutely frequency
+# S       secondly frequency
+# L       milliseonds
+# U       microseconds
+# N       nanoseconds
+
+http://stackoverflow.com/questions/29370057/select-dataframe-rows-between-two-dates#29370182
+http://stackoverflow.com/questions/20083098/improve-pandas-pytables-hdf5-table-write-performance#20084843
+https://www.quantstart.com/articles/Backtesting-a-Moving-Average-Crossover-in-Python-with-pandas
+
+
+Time/Date Components
+
+http://pandas.pydata.org/pandas-docs/version/0.15.2/timeseries.html
+There are several time/date properties that one can access from Timestamp or a collection of timestamps like a DateTimeIndex.
+Property 	Description
+year 	The year of the datetime
+month 	The month of the datetime
+day 	The days of the datetime
+hour 	The hour of the datetime
+minute 	The minutes of the datetime
+second 	The seconds of the datetime
+microsecond 	The microseconds of the datetime
+nanosecond 	The nanoseconds of the datetime
+date 	Returns datetime.date
+time 	Returns datetime.time
+dayofyear 	The ordinal day of year
+weekofyear 	The week ordinal of the year
+week 	The week ordinal of the year
+dayofweek 	The day of the week with Monday=0, Sunday=6
+weekday 	The day of the week with Monday=0, Sunday=6
+quarter 	Quarter of the date: Jan=Mar = 1, Apr-Jun = 2, etc.
+is_month_start 	Logical indicating if first day of month (defined by frequency)
+is_month_end 	Logical indicating if last day of month (defined by frequency)
+is_quarter_start 	Logical indicating if first day of quarter (defined by frequency)
+is_quarter_end 	Logical indicating if last day of quarter (defined by frequency)
+is_year_start 	Logical indicating if first day of year (defined by frequency)
+is_year_end 	Logical indicating if last day of year (defined by frequency)
+
+
+
+
+# to time, use %timeit
+
+ataFrame.fillna(value=None, method=None, axis=None, inplace=False, limit=None, downcast=None, **kwargs)[source]¶
+
+    # debug_plot = True
+    # # plot the data
+    # if (debug_plot == True):
+    #     viz = my_visualizer.Visualizer()
+    #     viz.df_normal(btmu_stream)
+    #     viz.df_normal(ebs_ultra_stream)
+    #     viz.df_normal(ebs_live_stream)
+
+
+
+
+    # thought: why not use groupby, say by 100ms, instead?
+    #print (btmu_stream.data.head(10))
+    #print (btmu_stream.data.groupby(btmu_stream.data.index.minute).head(5))
+    #print (btmu_stream.data.groupby(btmu_stream.data.index.minute).bid.sum().head(5))
+
+
+    # ####################
+    # # test RANDOM model
+    # ####################
+    # model = my_model_RANDOM.RandomForecastingStrategy('BTMU_HC_1', btmu_stream.data)
+    # signals = model.generate_signals()g
+    # print(signals)
+    # # let's leave the portfolio for the later analysis
+    # # for now, just focus on the signals
+    # # portfolio = my_model_RANDOM.MarketOnOpenPortfolio('BTMU_HC_1', btmu_stream.data, signals, initial_capital=100000.0)
+    # # returns = portfolio.backtest_portfolio()
+    # # print (returns.tail(10))
+
+    ####################
+    # test MA model
+    ####################
+    # Create a Moving Average Cross Strategy instance with a short moving
+    # average window of 100 days and a long window of 400 days
+    #model = my_model_BTMU.MovingAverageCrossStrategy_BTMU(btmu_stream, ebs_utltra_stream, slide_window=100)
+    #signals = model.generate_signals()
+    #print (signals['positions'])
+
+
+        # # BTMU vs EBS_LIVE
+    # btmu_ebs_live_model = my_model_CROSS.MovingAverageCrossStrategy(btmu_stream, ebs_live_stream, slide_window=100)
+    # btmu_ebs_live_signals = btmu_ebs_live_model.generate_signals()
+    # plt.plot(btmu_ebs_live_signals.BTMU_HC_1_mavg_bid)
+    # plt.plot(btmu_ebs_live_signals.EBS_LIVE_NY_XML_A_mavg_bid)
+    # plt.show()
+
+    # plt.plot(signals.BTMU_HC_1_mavg_offer)
+    # plt.plot(signals.EBS_ULTRA_NY_A_mavg_offer)
+    # plt.show()
+
+    #print(btmu_ebs_ultra_signals[c1].index)
+    #print(np.nonzero(btmu_ebs_ultra_signals.signal))
+    #print(btmu_ebs_ultra_signals.loc[btmu_ebs_ultra_signals['signal'] == 1])
+
+
+    # print data stream information if necessary
+    #data.data_info(btmu_stream)
+    #data.data_info(ebs_utltra_stream)
+    #data.data_info(ebs_live_stream)
+
+
+
+###############################################
+      the main function back up
+###############################################
+
+
+import sys, platform
+sys.path.append('/home/jsong/notebooks')
+
+import matplotlib.pyplot as plt
+import math
+import numpy as np
+import pandas as pd
+import datetime as dt
+import dask
+from dateutil import parser
+import velidb.btcommon as bt
+from velidb.tobcache import tob_cache
+
+pd.set_option('display.mpl_style', 'default')
+%matplotlib inline
+
+# user defined classes -- accessorys function
+import DATA          as my_data
+import VISUALIZER    as my_visualizer
+# user defined classes -- different modemls for BTMU project
+import MODEL_RANDOM  as my_model_RANDOM
+import MODEL_MA      as my_model_MA
+import MODEL_CROSS   as my_model_CROSS
+import CONFIGURATION as my_config
+
+feeds_list = ['BTMU_HC_1', 'EBS_ULTRA_NY_A', 'EBS_LIVE_NY_XML_A']
+currency_list = ['EURUSD']
+# currency = ['EURUSD', 'GBPUSD', 'USDJPY', 'USDHCHF', 'EURCHF', 'AUDUSD', 'USDCAD', 'NZDUSD', 'USDMZN', 'EURSEK',
+#             'USDHKD', 'USDZAR', 'EURNOK', 'EURCZK', 'EURDKK', 'EURHUF', 'USDCNH', 'EURPLN']
+
+# configuration (time scope, feeds, currency etc.)
+my_debug_plot = False       #
+my_debug_data = True
+my_start_time = dt.datetime(2017, 4, 4)  # start date in (Year, Month, Date)
+my_days       = 1            # number of days that data span over
+my_debug_hours = 0            # hours of data (can be used for fast debug)
+my_debug_minutes = 0          # minutes of data (can be used for fast debug)
+my_debug_seconds = 5          # seconds of data (can be used for fast debug)
+my_sampling_rule = '100L'    # for resample, H, T, S, L, U, N (from hour to ns). Example: 100L is 100ms
+my_sliding_window = 1        # for rolling MA (1 unit)
+my_computing_window = 30  # for periodic chunk size (30000 is 30000ms, which is 30s)
+
+# the main function that does the computation
+def run():
+    ######################
+    # Model Configuration
+    ######################
+    # sampling_rule     : the time window size for resample, ''  means the raw data
+    # sliding_window    : the window size for moving average computation
+    # computing_period  : the periodicity of computing the MA crossing, in ms
+    # Example:      300/100L => 3 points
+    #               if sampling_rule is 100ms, data_period is 300ms
+    #               then there will be 3 points/signals generated per period
+    # Note: data_period should be automatically measured (i.e., 95%)
+    # For the rest parameters, see above comments
+    config = my_config.ModelConfiguration(sampling_rule=my_sampling_rule,
+                                          sliding_window=my_sliding_window,
+                                          computing_window=my_computing_window,
+                                          start_time=my_start_time,
+                                          days=my_days,
+                                          hours=my_debug_hours,
+                                          minutes=my_debug_minutes,
+                                          seconds=my_debug_seconds,
+                                          feeds=feeds_list,
+                                          currency=currency_list,
+                                          debug_plot=my_debug_plot,
+                                          debug_data=my_debug_data)
+
+    # load all the data, and do the conversion if necessary
+    # from the preview, it seems that 15 ms is the period
+    data = my_data.Init_Data(config)
+
+    # plot the data
+    if config.debug_plot:
+        viz = my_visualizer.Visualizer()
+        viz.preview(data)
+
+    # input 2 different feed streams and generate signals from 2 input feed streams
+    # prepare the data stream
+    btmu_stream       = my_data.DataStream(data.dfs['BTMU_HC_1'], 'BTMU_HC_1', config)
+    ebs_ultra_stream  = my_data.DataStream(data.dfs['EBS_ULTRA_NY_A'], 'EBS_ULTRA_NY_A', config)
+    ebs_live_stream   = my_data.DataStream(data.dfs['EBS_LIVE_NY_XML_A'], 'EBS_LIVE_NY_XML_A', config)
+
+    # BTMU vs EBS_ULTRA
+    model = my_model_CROSS.MovingAverageCrossStrategy(btmu_stream, ebs_ultra_stream, config)
+    signals = model.generate_signals()
+
+    c1 = signals['bid_signal'].map(lambda x: x == 1)
+
+    print(c1.shape)
+
+    #c2 = btmu_stream.data['bid'].loc[btmu_ebs_ultra_signals[c1].index]
+    # plot and print some information here
+    #print(signals.head(5))
+    #print(np.count_nonzero(signals.signal))
+    plt.plot(signals.BTMU_HC_1_mavg_bid, c='red')
+    plt.plot(signals.EBS_ULTRA_NY_A_mavg_bid, c='blue')
+    #plt.scatter(signals[c1].index, signals[c1].BTMU_HC_1_mavg_bid, c='black', s=10, edgecolor='none')
+
+    plt.title('MA Cross')
+    plt.xlabel('Time')
+    plt.ylabel('MA Price')
+    plt.legend(loc='lower left')
+    plt.show()
+
+
+if __name__ == "__main__":
+    print ('Starting...')
+    print ("python version: " + platform.python_version())
+    print ("pandas version: " + pd.__version__)
+    print ("numpy  version: " + np.__version__)
+    print ("dask  version: " + dask.__version__)
+
+    run()
+
+    print ('Done!!')
